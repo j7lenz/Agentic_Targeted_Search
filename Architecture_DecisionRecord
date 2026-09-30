@@ -1,1 +1,37 @@
+"""V1 - Agentic Search"""
+
+Components:
+-Classification and Routing - Requests are routed to the most appropriate models and appropriate settings to solve the problem.
+-One Agent - Research Agent - Resposible for handling the searching and gathering of prospective matches
+-One Task
+-Crew orchestrates all agents and tasks
+
+Telemetry:
+-First iteration we integrated directly with CrewAI Telemetry dashboard
+-~80% of the execution time was consumed by planning and reasoning tasks.
+
+Initial Observations:
+-With planning and reasoning mode fully turned on executing the workflow locally took 530-600 seconds (range from 5-10 runs). 
+-Removing both planning and reasoning mode significantly reduced token utilization and latency. Improving from:
+-Token Utilization - Initially consumed 5,800 tokens per run; reduced down to 1,200-1,600 tokens  (~75% reduction)
+-Latency - Initially consumed 530-600 seconds per run; reduced down to 150-180 seconds. (~70% reduction)
+
+Stress-Testing the First Iteration:
+-We observed that the changes in planning and reasoning mode usage both significantly reduced token spend and latency while having minimum impact on reliability 
+of the end results
+-We decided to stress test this line of observation by increasing the number of inputs in the list with the hypothesis that more inputs for the agent to search or analyze 
+would lead to both increased execution time and higher prevalence of agent errors and hallucinations. 
+
+Planning the second Iteration:
+-Introduce Structured input/outputs formats using pydantic and instructor modules
+-Incorporate guardrails 
+-Incorporate tools
+-Incorporate flows for controlled deterministic code execution
+-Re-incorporate planning and reasoning modes where needed- Maybe this is a good place for Jev to assist and support the effort?
+
+
+
+
+
+
 
