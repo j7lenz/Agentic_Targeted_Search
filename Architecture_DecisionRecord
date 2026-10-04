@@ -29,6 +29,35 @@ Planning the second Iteration:
 -Incorporate flows for controlled deterministic code execution
 -Re-incorporate planning and reasoning modes where needed- Maybe this is a good place for Jev to assist and support the effort?
 
+"""V2 Agentic Search"""
+Starting Settings:
+-Left planning and reasoning turned off completely
+Goal: Harden the first task agent into a full workflow that could run reliably
+Implementation: Created a flow to enforce deterministic execution of the agentic system. 
+
+Implementing a PortfolioResearchStateFlow - This involved some learning curve to understand the decorators and how the full event-driven flow worked.
+Process and Implementation we followed:
+-Initial implementation - Two agent system with a researcher agent to identify and find portfolio companies affiliated with the funds, and a validation agent to handle verifying each portfolio company
+returned by the agent had a valid and active business registration and website. Kicking off the workflow was done using a crew and going through each item in the list and pushing it into the flow.
+
+*Roadblocks, Discoveries, and Resolutions:
+-Roadblock #1 - When I attempted to run the 2 agent workflows side by side as tasks- we discovered the flow was physically overwriting task 1 once task 2 completed. 
+-Roadblock #2 - The validation logic was not processing every entry in the portfolio companies output
+
+This is where the first major design decision had to be made- After tracing through the entire logic chain it was clear that the reason the validation logic was not processing every entry in the portfolio companies output is that it was anchored to the number of entries in the initial dataset - the # of funds NOT the # of portfolio companies
+-I re-designed the workflow so that the task results were run exactly once and fully idempotent in the pipeline. Ultimately, instead of creating one kickoff per crew, I designed the workflow so there is one kickoff per task.
+-This enforces idempotent design in the flow, and ensures flexibility for steps to be independent from each other in the full workflow
+-However, making execution kickoff task-level rather than system-level removed important context from the model causing the llm to hallucinate more frequently. Task prompts therefore needed to be amended for significantly higher ease of understanding.
+-Once the task prompts had been amended such that the llm hallucination frequency for task #1 dropped significantly - I shifted focus to ensuring reliability under larger loads
+-We gradually added more entries to the inputs list and found latency exploded when the slm was asked to scan through a list. To resolve this, we restructured the flow code such that the prompt feeds each successive fund name to the slm easing the reasoning and schema interpretation burden
+-Finally, by the end of the changes made we were able to successfully run a batch of 5 funds, generate 25 portfolio companies, and complete the execution is <= 80 seconds on CPU only
+
+*Guardrails Implemented
+-Implemented a completeness guardrail ensuring the slm generated the correct number of entries requested and didn't drop expected entries in outputs
+
+
+
+
 
 
 
