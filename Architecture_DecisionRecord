@@ -8,6 +8,7 @@ Components:
 
 Telemetry:
 -First iteration we integrated directly with CrewAI Telemetry dashboard
+-3 Runs tested between ~530-600 seconds in execution time with ~5,800 tokens consumed (2,400 prompt and 3,400 output).
 -~80% of the execution time was consumed by planning and reasoning tasks.
 
 Initial Observations:
@@ -38,7 +39,7 @@ Implementation: Created a flow to enforce deterministic execution of the agentic
 Implementing a PortfolioResearchStateFlow - This involved some learning curve to understand the decorators and how the full event-driven flow worked.
 Process and Implementation we followed:
 -Initial implementation - Two agent system with a researcher agent to identify and find portfolio companies affiliated with the funds, and a validation agent to handle verifying each portfolio company
-returned by the agent had a valid and active business registration and website. Kicking off the workflow was done using a crew and going through each item in the list and pushing it into the flow.
+returned by the agent has a valid and active business registration and website. Kicking off the workflow was done using a crew and going through each item in the list and pushing it into the flow.
 
 *Roadblocks, Discoveries, and Resolutions:
 -Roadblock #1 - When I attempted to run the 2 agent workflows side by side as tasks- we discovered the flow was physically overwriting task 1 once task 2 completed. 
@@ -57,15 +58,32 @@ This is where the first major design decision had to be made- After tracing thro
 
 *Tasks Implemented:
 Task 1 - Loop through a list of VC funds and generate matching portfolio companies
+Task 2 - Loop through the list of portfolio companies and validate each one is valid - This implementation was smooth but tool usage needs additional fine tuning
+for reliability, and safety
 
-Task 2 - Loop through the list of portfolio companies and validate each one is valid
+***Diagnosing Performance Degradation once Task 1 and Task 2 are combined into a single flow- 
+*Task 1 performance degraded significantly once the size of the input list was increased- jumping from ~100-150 seconds to ~600 seconds
+We hypothsize 5 causes for performance degradation-
+1) Hardware limitations(Memory and CPU limits)
+2) Inefficient token spend
+3) Inefficient processing /CPU usage - using synchronous vs. asynchronous processing methods
+4) Inefficient tool usage
+5) Compounded hallucinations- example: i.e. SLM fails guardrail once, hallucinates a fix and fails again, and finally succeeds third time. Although it eventually succeeded latency
+exponentially increases because the number of turns the model takes increases on each cycle and its contenxt window expands
 
+*To make this more reliable, we want to add telemetry to the final version
+-Next design question- We havr 3 different choices in terms of implementing telemetry:
+1) Create a custom decorator to track task-level execution and token efficiency tracking details - decorate each function with it
+Pros: Highly Reuseable
+Cons: Obscure implementation and Hard to debug when stacking decorators
 
-*Performance Degradation- 
--> Task 1 performance degraded significantly once the size of the input list was increased- jumping from ~100-150 seconds to ~600 seconds
+2) Create a custom base class with the task-level telemetry, tracking, and token efficiency tracking details included. Inherit from that class instead
+Pros: Enforces the intended goal. Creates re-useable template
+Cons: Rigidity, what if we miss something and want to change the base class? Our base class logic is now tightly coupled to our implementation in the flow.
 
-
-
+3) Wrap task-level execution details in telemetry, tracing, and token efficiency, do not add a seperate function to do this
+Pros: Clear and Explicit
+Cons: Mixing responsibilities of methods
 
 
 
