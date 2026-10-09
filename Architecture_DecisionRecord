@@ -55,6 +55,16 @@ This is where the first major design decision had to be made- After tracing thro
 *Guardrails Implemented
 -Implemented a completeness guardrail ensuring the slm generated the correct number of entries requested and didn't drop expected entries in outputs
 
+*Tasks Implemented:
+Task 1 - Loop through a list of VC funds and generate matching portfolio companies
+
+Task 2 - Loop through the list of portfolio companies and validate each one is valid
+
+
+*Performance Degradation- 
+-> Task 1 performance degraded significantly once the size of the input list was increased- jumping from ~100-150 seconds to ~600 seconds
+
+
 
 
 
