@@ -85,6 +85,10 @@ Cons: Rigidity, what if we miss something and want to change the base class? Our
 Pros: Clear and Explicit
 Cons: Mixing responsibilities of methods
 
+*Ultimately, I implemented the basic/simple solution with arize-phoenix then ran into a permission error and not a directory error when I attempted to run it. Found out the problem was 
+creating incompatible pathing with the user directories- we thus had to move the entire project
+
+
 
 
 
