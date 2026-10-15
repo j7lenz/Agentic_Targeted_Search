@@ -85,9 +85,10 @@ Cons: Rigidity, what if we miss something and want to change the base class? Our
 Pros: Clear and Explicit
 Cons: Mixing responsibilities of methods
 
-*Ultimately, I implemented the basic/simple solution with arize-phoenix then ran into a permission error and not a directory error when I attempted to run it. Found out the problem was 
-creating incompatible pathing with the user directories- we thus had to move the entire project
-
+We run straight into a nasty surprise after implementing the basic implementation with arize-phoenix- Permission and Directory Errors- this is largely due to where I housed the project
+-> To fix this, we were forced to migrate the project out of the user directories
+-> We copy the file over, recreate virtual environments and package installs safely. We do not delete or move the original file to prevent from causing additional issues with the worktree
+-> This actually failed to copy over the correct files using robocopy, broke our git work trees? 
 
 
 
